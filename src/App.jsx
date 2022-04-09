@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 
 function App() {
 
   const [data, setData] = useState([])
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(5)
+  const [pageSize, setPageSize] = useState(10)
   const [count, setCount] = useState(0)
   const [trigger, setTrigger] = useState(0)
   const [indent, setIndent] = useState(0)
@@ -15,6 +15,7 @@ function App() {
       const firstCall = await fetch(`https://jsonplaceholder.typicode.com/photos?_page=${URLPage}&_limit=${URLPageSize}`)
       const firstData = await firstCall.json()
       let allData = []
+
       for (let i = useIndent; i < firstData.length; i++) {
         allData.push(firstData[i])
       }
@@ -26,6 +27,7 @@ function App() {
           allData.push(secondData[i])
         }
       }
+
       setData([...data, ...allData])
       setCount(count + firstData.length)
 
@@ -46,32 +48,54 @@ function App() {
     setTrigger(trigger + 1)
   }
 
+  const handleLazyLoad = () => {
+    const imageObserver = new IntersectionObserver((images) => images.forEach((image) => {
+        if (image.isIntersecting) {
+          const img = image.target
+          img.src = img.dataset.src
+          imageObserver.unobserve(img)
+        }
+      })
+    )
+    document.querySelectorAll('.lazy').forEach((elm) => imageObserver.observe(elm))
+  }
+
+
   useEffect(() => {
     fetchDataAndCount(page, pageSize, indent)
   }, [trigger])
+  handleLazyLoad()
+
 
   return (
     <div className='container'>
-      <div className="header">
-        <h1>Fetch Data</h1>
-        <p>Current List size: {count}</p>
-        <p>Next List: {count}+{pageSize}; next count = {count + pageSize}</p>
-        <p>Next page: {(count+pageSize)/pageSize}</p>
+      <div className='header'>
+        <div className='info'>
+          <h1>Fetch Image</h1>
+          <p>Current List size: {count}</p>
+        </div>
+        <div className='selector-container'>
+          <select defaultValue={pageSize} selected='selected' onChange={handleSelectPageSize}>
+            <option value='5'>Fetch 5 Image</option>
+            <option value='10'>Fetch 10 Image</option>
+            <option value='30'>Fetch 30 Image</option>
+          </select>
+          <button onClick={handleTrigger}>Fetch</button>
+        </div>
       </div>
 
-      <div className="list-container">
+      <div className='list-container'>
         {data.map((item) => (
-          <div key={item.id}>{item.id}</div>
+          <div>
+            <div key={item.id} className='image-item'>
+              <div className='id'>{item.id}</div>
+              <div className='image'>
+                <span className="loading">Loading...</span>
+                <img className='lazy' data-src={item.url} alt='' />
+              </div>
+            </div>
+          </div>
         ))}
-      </div>
-
-      <div className="selector-container">
-        <select defaultValue={pageSize} selected="selected" onChange={handleSelectPageSize}>
-          <option value="5">Fetch 5 Image</option>
-          <option value="10">Fetch 10 Image</option>
-          <option value="30">Fetch 30 Image</option>
-        </select>
-        <button onClick={handleTrigger}>Test</button>
       </div>
     </div>
   )
