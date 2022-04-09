@@ -109,6 +109,7 @@ function App() {
         <div className="loading-content">
           <button onClick={handleTrigger}>Click here, if content doesn't load automatically </button>
         </div>
+        <a href="#" className="source-code-link" target="_blank">Source Code</a>
       </div>
     </div>
   )
