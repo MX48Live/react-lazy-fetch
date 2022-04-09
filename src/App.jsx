@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import './App.css'
+import { useState, useEffect, useRef } from "react"
+import "./App.css"
 
 function App() {
 
@@ -48,54 +48,67 @@ function App() {
     setTrigger(trigger + 1)
   }
 
-  const handleLazyLoad = () => {
-    const imageObserver = new IntersectionObserver((images) => images.forEach((image) => {
+  const handleLazyLoadImage = () => {
+    const imageObserver = new IntersectionObserver((images) =>
+      images.forEach((image, index) => {
         if (image.isIntersecting) {
           const img = image.target
           img.src = img.dataset.src
           imageObserver.unobserve(img)
+          console.log("index: ", index)
         }
       })
     )
-    document.querySelectorAll('.lazy').forEach((elm) => imageObserver.observe(elm))
+    document.querySelectorAll(".lazy").forEach((elm) => imageObserver.observe(elm))
   }
 
+  const handleLazyLoadContent = () => {
+    window.onscroll = function(ev) {
+      if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight) {
+        handleTrigger()
+      }
+    }
+  }
 
   useEffect(() => {
     fetchDataAndCount(page, pageSize, indent)
   }, [trigger])
-  handleLazyLoad()
+
+  handleLazyLoadImage()
+  handleLazyLoadContent()
 
 
   return (
-    <div className='container'>
-      <div className='header'>
-        <div className='info'>
+    <div className="container">
+      <div className="header">
+        <div className="info">
           <h1>Fetch Image</h1>
           <p>Current List size: {count}</p>
         </div>
-        <div className='selector-container'>
-          <select defaultValue={pageSize} selected='selected' onChange={handleSelectPageSize}>
-            <option value='5'>Fetch 5 Image</option>
-            <option value='10'>Fetch 10 Image</option>
-            <option value='30'>Fetch 30 Image</option>
+        <div className="selector-container">
+          <select defaultValue={pageSize} selected="selected" onChange={handleSelectPageSize}>
+            <option value="5">Fetch 5 Image</option>
+            <option value="10">Fetch 10 Image</option>
+            <option value="30">Fetch 30 Image</option>
           </select>
-          <button onClick={handleTrigger}>Fetch</button>
         </div>
       </div>
 
-      <div className='list-container'>
+      <div className="list-container">
         {data.map((item) => (
           <div>
-            <div key={item.id} className='image-item'>
-              <div className='id'>{item.id}</div>
-              <div className='image'>
+            <div key={item.id} className="image-item">
+              <div className="id">{item.id}</div>
+              <div className="image">
                 <span className="loading">Loading...</span>
-                <img className='lazy' data-src={item.url} alt='' />
+                <img className="lazy" data-src={item.url} alt="" />
               </div>
             </div>
           </div>
         ))}
+        <div className="loading-content">
+          <button onClick={handleTrigger}>Click here, if content doesn't load automatically </button>
+        </div>
       </div>
     </div>
   )

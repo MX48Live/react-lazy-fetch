@@ -7,7 +7,7 @@ body {
 .container {
     max-width: 900px;
     margin: 0 auto;
-    padding-bottom: 120px;
+    padding-bottom: 00px;
 }
 
 .header {
@@ -76,5 +76,24 @@ body {
 .image-item img {
     display: block;
     max-width: 100%;
+}
+
+.loading-content {
+    color: #888;
+    letter-spacing: 1px;
+    padding: 20px 0;
+}
+.loading-content p {
+    margin: 0;
+    margin-bottom: 4px;
+}
+.loading-content button {
+    appearance: none;
+    border: none;
+    padding: 5px;
+    background-color: #fff;
+    color: orange;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
